@@ -12,12 +12,9 @@ export default class TipForm extends Component {
             totalAmount: '',
             isCalculated: false
         };
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleReset = this.handleReset.bind(this);
     }
 
+    //Function that determines tip percent based on quality
     tipAmount = (quality) => {
         if (quality === 'Great') {
             return 0.25;
@@ -32,7 +29,7 @@ export default class TipForm extends Component {
         }
     }
 
-  handleChange(event) {
+  handleChange = (event) => {
       const name = event.target.name;
       const value = name === 'billAmount' ? parseFloat(event.target.value) : event.target.value;
 
@@ -52,10 +49,9 @@ export default class TipForm extends Component {
       } 
 
       this.setState({[name]: value});
-
   }
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
       const tipPercent = this.tipAmount(this.state.serviceQuality);
       const billAmount = this.state.billAmount;
@@ -64,7 +60,7 @@ export default class TipForm extends Component {
      this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount, isCalculated: true});
   }
 
-  handleReset() {
+  handleReset = () => {
       this.setState(
              {
             billAmount: '',
@@ -81,7 +77,7 @@ export default class TipForm extends Component {
         return (
         <Container>
             <h1>Tip Calculator</h1>
-            <Form onSubmit={this.handleSubmit}>
+            <Form>
             <Form.Group controlId="formGroupEmail">
                 <Form.Label>Bill Amount</Form.Label>
                 <Form.Control type="text" name='billAmount' value={this.state.billAmount} onChange={this.handleChange} placeholder="Enter bill amount" />
@@ -116,7 +112,7 @@ export default class TipForm extends Component {
                 </div>)
             }
             </Container>
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" onClick={this.handleSubmit}>
             Submit
             </Button>
             <Button className="mx-1" variant="secondary" type="submit" onClick={this.handleReset}>
