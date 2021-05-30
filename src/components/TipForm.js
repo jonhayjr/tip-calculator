@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Container, Form, Button} from 'react-bootstrap';
 
-
 export default class TipForm extends Component {
     constructor(props) {
         super(props);
@@ -34,19 +33,21 @@ export default class TipForm extends Component {
     }
 
   handleChange(event) {
-      const value = event.target.value;
       const name = event.target.name;
+      const value = name === 'billAmount' ? parseFloat(event.target.value) : event.target.value;
+
       if (this.state.billAmount !== value && name === 'billAmount' && this.state.serviceQuality) {
         const tipPercent = this.tipAmount(this.state.serviceQuality);
-        const billAmount = parseInt(value);
-        const tipAmount = tipPercent * billAmount;
+        const billAmount = value;
+        const tipAmount = (tipPercent * billAmount);
         const totalAmount = tipAmount + billAmount;
         this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount});
       } else if (this.state.serviceQuality !== value && name === 'serviceQuality' && this.state.billAmount) {
         const tipPercent = this.tipAmount(value);
-        const billAmount = parseInt(this.state.billAmount);
+        const billAmount = this.state.billAmount;
         const tipAmount = tipPercent * billAmount;
         const totalAmount = tipAmount + billAmount;
+     
         this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount});
       } 
 
@@ -57,7 +58,7 @@ export default class TipForm extends Component {
   handleSubmit(event) {
     event.preventDefault();
       const tipPercent = this.tipAmount(this.state.serviceQuality);
-      const billAmount = parseInt(this.state.billAmount);
+      const billAmount = this.state.billAmount;
       const tipAmount = tipPercent * billAmount;
       const totalAmount = tipAmount + billAmount;
      this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount, isCalculated: true});
@@ -108,10 +109,10 @@ export default class TipForm extends Component {
             {
                 this.state.isCalculated && this.state.billAmount && this.state.serviceQuality &&
                 (<div>
-                  <p>Bill Amount: ${this.state.billAmount}</p>
-                   <p>Tip Percent: {this.state.tipPercent}%</p>
-                  <p>Tip Amount: ${this.state.tipAmount}</p>
-                  <p>Your total bill amount is: ${this.state.totalAmount}.</p>
+                  <p>Bill Amount: ${this.state.billAmount.toFixed(2)}</p>
+                   <p>Tip Percent: {this.state.tipPercent * 100}%</p>
+                  <p>Tip Amount: ${this.state.tipAmount.toFixed(2)}</p>
+                  <p>Your total bill amount is: ${this.state.totalAmount.toFixed(2)}.</p>
                 </div>)
             }
             </Container>
