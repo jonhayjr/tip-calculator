@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 import {Container, Form, Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
+//Import components
+import TipSection from './TipSection';
+
 export default class TipForm extends Component {
     constructor(props) {
         super(props);
@@ -11,7 +14,8 @@ export default class TipForm extends Component {
             tipPercent: '',
             tipAmount: '',
             totalAmount: '',
-            isCalculated: false
+            isCalculated: false,
+            isValidNumber: true
         };
     }
 
@@ -30,35 +34,55 @@ export default class TipForm extends Component {
         }
     }
 
+    //Calculates tip and totalsAmounts
+    calculateTipAndTotalBillAmount = (serviceQuality, bill) => {
+        //Update tipPercent if serviceQuality changed
+        const tipPercent = this.state.serviceQuality !== serviceQuality ? this.tipAmount(serviceQuality) : this.state.tipPercent;
+        const billAmount = parseFloat(bill).toFixed(2);
+        const tipAmount = (tipPercent * billAmount).toFixed(2);
+        const totalAmount = (parseFloat(tipAmount) + parseFloat(billAmount)).toFixed(2);
+        this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount, serviceQuality: serviceQuality});
+    }
+
   handleChange = (event) => {
       const name = event.target.name;
-      const value = name === 'billAmount' ? parseFloat(event.target.value) : event.target.value;
+      let value = event.target.value;
 
-      if (this.state.billAmount !== value && name === 'billAmount' && this.state.serviceQuality) {
-        const tipPercent = this.tipAmount(this.state.serviceQuality);
-        const billAmount = value;
-        const tipAmount = (tipPercent * billAmount);
-        const totalAmount = tipAmount + billAmount;
-        this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount});
-      } else if (this.state.serviceQuality !== value && name === 'serviceQuality' && this.state.billAmount) {
-        const tipPercent = this.tipAmount(value);
-        const billAmount = this.state.billAmount;
-        const tipAmount = tipPercent * billAmount;
-        const totalAmount = tipAmount + billAmount;
-     
-        this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount});
+      //Intialize isValidNumber variable with a value of true
+      let isValidNumber = true;
+    
+      //If billAmount is not a number, set isValidNumber variable to 0.
+      if (name === 'billAmount' && isNaN(event.target.value)) {
+          isValidNumber = false;
+      }
+
+      //If billAmount is invalid, update value to blank.  Use the event.target.value in all other scenarios.
+      if (name === 'billAmount' && !isValidNumber) {
+        value = '';
+      } 
+      //Calculates tip percent based on service quality value
+      const tipPercent = name === 'serviceQuality' ? this.tipAmount(value) : this.state.tipPercent;
+
+      //Set state for input value and isValidNumber value.
+      this.setState({[name]: value, isValidNumber: isValidNumber, tipPercent: tipPercent});
+
+      //When bill amount is updated and serviceQuality value exists and number is valid, calculates tip amounts.  When service quality is updated and billAmount value exists and number is valid, calculates tip amounts.
+      if (this.state.billAmount !== value && name === 'billAmount' && this.state.serviceQuality && isValidNumber) {
+        this.calculateTipAndTotalBillAmount(this.state.serviceQuality, value)
+      } else if (this.state.serviceQuality !== value && name === 'serviceQuality' && this.state.billAmount && isValidNumber) {
+        this.calculateTipAndTotalBillAmount(value, this.state.billAmount);
       } 
 
-      this.setState({[name]: value});
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
-      const tipPercent = this.tipAmount(this.state.serviceQuality);
-      const billAmount = this.state.billAmount;
-      const tipAmount = tipPercent * billAmount;
-      const totalAmount = tipAmount + billAmount;
-     this.setState({tipAmount: tipAmount, tipPercent: tipPercent, totalAmount: totalAmount, isCalculated: true});
+
+    //Only calculates tip amounts when bill amount is a valid number.
+    if (this.state.isValidNumber) {
+        this.calculateTipAndTotalBillAmount(this.state.serviceQuality, this.state.billAmount);
+        this.setState({isCalculated: true});
+    }
   }
 
   handleReset = () => {
@@ -69,7 +93,8 @@ export default class TipForm extends Component {
             tipPercent: '',
             tipAmount: '',
             totalAmount: '',
-            isCalculated: false
+            isCalculated: false,
+            isValidNumber: true
         }
       )
   }
@@ -79,9 +104,14 @@ export default class TipForm extends Component {
         <Container>
             <h1>Tip Calculator</h1>
             <Form>
-            <Form.Group controlId="formGroupEmail">
+            <Form.Group controlId="formGroupBill">
                 <Form.Label>Bill Amount</Form.Label>
-                <Form.Control type="text" name='billAmount' value={this.state.billAmount} onChange={this.handleChange} placeholder="Enter bill amount" />
+                <Form.Control
+                type="number"
+                name='billAmount' 
+                value={this.state.billAmount} 
+                onChange={this.handleChange} 
+                placeholder="Enter bill amount" />
             </Form.Group>
             <Form.Label className="my-1 mr-2" htmlFor="inlineFormCustomSelectPref">
             How was the service?
@@ -99,18 +129,12 @@ export default class TipForm extends Component {
                 <option value="Great">Great - 25%</option>
                 <option value="Good">Good - 15%</option>
                 <option value="Okay">Okay - 10%</option>
-                <option value="Okay">Bad - 5%</option>
+                <option value="Bad">Bad - 5%</option>
                 <option value="Horrible">Horrible - 0%</option>
             </Form.Control>
-            {
-                this.state.isCalculated && this.state.billAmount && this.state.serviceQuality &&
-                (<div className="card m-5 p-2">
-                  <p className="lead">Bill Amount: <strong>${this.state.billAmount.toFixed(2)}</strong></p>
-                   <p className="lead">Tip Percent: <strong>{this.state.tipPercent * 100}%</strong></p>
-                  <p className="lead">Tip Amount: <strong>${this.state.tipAmount.toFixed(2)}</strong></p>
-                  <p className="lead">Your total bill amount is: <strong>${this.state.totalAmount.toFixed(2)}</strong></p>
-                </div>)
-            }
+
+            <TipSection billAmount={this.state.billAmount} tipPercent={this.state.tipPercent} tipAmount={this.state.tipAmount} totalAmount={this.state.totalAmount} isValidNumber={this.state.isValidNumber} isCalculated={this.state.isCalculated}  serviceQuality={this.state.serviceQuality}/>    
+            
             <Button variant="primary" type="submit" onClick={this.handleSubmit}>
             Submit
             </Button>
