@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Container, Form, Button} from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.css';
 
 export default class TipForm extends Component {
     constructor(props) {
@@ -94,24 +95,22 @@ export default class TipForm extends Component {
                 value={this.state.serviceQuality}
                 onChange={this.handleChange}
             >
-                <option value="0">Choose...</option>
+                <option value="">Choose...</option>
                 <option value="Great">Great - 25%</option>
                 <option value="Good">Good - 15%</option>
                 <option value="Okay">Okay - 10%</option>
                 <option value="Okay">Bad - 5%</option>
                 <option value="Horrible">Horrible - 0%</option>
             </Form.Control>
-            <Container>
             {
                 this.state.isCalculated && this.state.billAmount && this.state.serviceQuality &&
-                (<div>
-                  <p>Bill Amount: ${this.state.billAmount.toFixed(2)}</p>
-                   <p>Tip Percent: {this.state.tipPercent * 100}%</p>
-                  <p>Tip Amount: ${this.state.tipAmount.toFixed(2)}</p>
-                  <p>Your total bill amount is: ${this.state.totalAmount.toFixed(2)}.</p>
+                (<div className="card m-5 p-2">
+                  <p className="lead">Bill Amount: <strong>${this.state.billAmount.toFixed(2)}</strong></p>
+                   <p className="lead">Tip Percent: <strong>{this.state.tipPercent * 100}%</strong></p>
+                  <p className="lead">Tip Amount: <strong>${this.state.tipAmount.toFixed(2)}</strong></p>
+                  <p className="lead">Your total bill amount is: <strong>${this.state.totalAmount.toFixed(2)}</strong></p>
                 </div>)
             }
-            </Container>
             <Button variant="primary" type="submit" onClick={this.handleSubmit}>
             Submit
             </Button>
