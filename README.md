@@ -1,3 +1,9 @@
+# Tip Calculator App
+This is a simple tip calculator app that I created using React and React Bootstrap/Bootstrap.
+
+**Click below for a preview**\
+https://www.jonhayjr.com/Tip-Calculator
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
