@@ -15,7 +15,8 @@ export default class TipForm extends Component {
             tipAmount: '',
             totalAmount: '',
             isCalculated: false,
-            isValidNumber: true
+            isValidNumber: true,
+            isShowing: true
         };
     }
 
@@ -99,39 +100,49 @@ export default class TipForm extends Component {
       )
   }
 
+  //Show or Hide form field
+  showOrHide = () => {
+      this.setState({isShowing: !this.state.isShowing})
+  }
+
     render() {
+        
         return (
         <Container>
             <h1>Tip Calculator</h1>
-            <Form>
-            <Form.Group controlId="formGroupBill">
-                <Form.Label>Bill Amount</Form.Label>
+            {this.state.isShowing && 
+            (<Form>
+                <Form.Group controlId="formGroupBill">
+                    <Form.Label>Bill Amount</Form.Label>
+                    <Form.Control
+                    type="number"
+                    name='billAmount' 
+                    value={this.state.billAmount} 
+                    onChange={this.handleChange} 
+                    placeholder="Enter bill amount" />
+                </Form.Group>
+                <Form.Label className="my-1 mr-2" htmlFor="inlineFormCustomSelectPref">
+                How was the service?
+                </Form.Label>
                 <Form.Control
-                type="number"
-                name='billAmount' 
-                value={this.state.billAmount} 
-                onChange={this.handleChange} 
-                placeholder="Enter bill amount" />
-            </Form.Group>
-            <Form.Label className="my-1 mr-2" htmlFor="inlineFormCustomSelectPref">
-            How was the service?
-            </Form.Label>
-            <Form.Control
-                as="select"
-                className="my-1 mr-sm-2"
-                id="inlineFormCustomSelectPref"
-                custom
-                name='serviceQuality'
-                value={this.state.serviceQuality}
-                onChange={this.handleChange}
-            >
-                <option value="">Choose...</option>
-                <option value="Great">Great - 25%</option>
-                <option value="Good">Good - 15%</option>
-                <option value="Okay">Okay - 10%</option>
-                <option value="Bad">Bad - 5%</option>
-                <option value="Horrible">Horrible - 0%</option>
-            </Form.Control>
+                    as="select"
+                    className="my-1 mr-sm-2"
+                    id="inlineFormCustomSelectPref"
+                    custom
+                    name='serviceQuality'
+                    value={this.state.serviceQuality}
+                    onChange={this.handleChange}
+                >
+                    <option value="">Choose...</option>
+                    <option value="Great">Great - 25%</option>
+                    <option value="Good">Good - 15%</option>
+                    <option value="Okay">Okay - 10%</option>
+                    <option value="Bad">Bad - 5%</option>
+                    <option value="Horrible">Horrible - 0%</option>
+                </Form.Control>
+            </Form>)
+            }
+            <Button className="mt-3" type="submit" variant={this.state.isShowing ? 'dark': 'light'} onClick={this.showOrHide}>{this.state.isShowing ? 'Hide' : 'Show'}</Button>
 
             <TipSection billAmount={this.state.billAmount} tipPercent={this.state.tipPercent} tipAmount={this.state.tipAmount} totalAmount={this.state.totalAmount} isValidNumber={this.state.isValidNumber} isCalculated={this.state.isCalculated}  serviceQuality={this.state.serviceQuality}/>    
             
@@ -141,7 +152,6 @@ export default class TipForm extends Component {
             <Button className="mx-1" variant="secondary" type="submit" onClick={this.handleReset}>
             Reset
             </Button>
-            </Form>
         </Container>
         )
     }
